@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Compuertas Lógicas</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      margin-bottom: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    h2 {
+      margin-top: 0;
+    }
+    label {
+      margin-right: 10px;
+    }
+    input[type="checkbox"] {
+      margin-right: 5px;
+    }
+    .resultado {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NOT -->
+  <div class="card">
+    <h2>Compuerta NOT (1 input)</h2>
+    <label><input type="checkbox" id="notInput"> A</label>
+    <button onclick="calcularNOT()">Evaluar</button>
+    <div class="resultado" id="resNOT"></div>
+  </div>
+
+  <!-- AND con 3 inputs -->
+  <div class="card">
+    <h2>Compuerta AND (3 inputs)</h2>
+    <label><input type="checkbox" id="andA"> A</label>
+    <label><input type="checkbox" id="andB"> B</label>
+    <label><input type="checkbox" id="andC"> C</label>
+    <button onclick="calcularAND()">Evaluar</button>
+    <div class="resultado" id="resAND"></div>
+  </div>
+
+  <!-- OR con 3 inputs -->
+  <div class="card">
+    <h2>Compuerta OR (3 inputs)</h2>
+    <label><input type="checkbox" id="orA"> A</label>
+    <label><input type="checkbox" id="orB"> B</label>
+    <label><input type="checkbox" id="orC"> C</label>
+    <button onclick="calcularOR()">Evaluar</button>
+    <div class="resultado" id="resOR"></div>
+  </div>
+
+  <script>
+    function calcularNOT() {
+      const A = document.getElementById('notInput').checked;
+      const resultado = !A;
+      document.getElementById('resNOT').textContent = `NOT(${+A}) = ${+resultado}`;
+    }
+
+    function calcularAND() {
+      const A = document.getElementById('andA').checked;
+      const B = document.getElementById('andB').checked;
+      const C = document.getElementById('andC').checked;
+      const resultado = A && B && C;
+      document.getElementById('resAND').textContent = `AND(${+A}, ${+B}, ${+C}) = ${+resultado}`;
+    }
+
+    function calcularOR() {
+      const A = document.getElementById('orA').checked;
+      const B = document.getElementById('orB').checked;
+      const C = document.getElementById('orC').checked;
+      const resultado = A || B || C;
+      document.getElementById('resOR').textContent = `OR(${+A}, ${+B}, ${+C}) = ${+resultado}`;
+    }
+  </script>
+</body>
+</html>

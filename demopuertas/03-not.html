@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puerta Lógica NOT</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f5f5f5;
+            margin: 0;
+            color: #333;
+        }
+        
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        
+        .circuit-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .input-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 200px;
+        }
+        
+        .input-row {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            position: relative;
+            width: 100%;
+            justify-content: flex-end;
+        }
+        
+        .input-label {
+            font-weight: bold;
+            margin-right: 15px;
+            width: 70px;
+            text-align: right;
+        }
+        
+        .switch {
+            width: 60px;
+            height: 30px;
+            background-color: #95a5a6;
+            border-radius: 15px;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-right: 15px;
+        }
+        
+        .switch::after {
+            content: '';
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            background-color: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .switch.on {
+            background-color: #2ecc71;
+        }
+        
+        .switch.on::after {
+            transform: translateX(30px);
+        }
+        
+        .input-light {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #3498db;
+            box-shadow: 0 0 10px rgba(52, 152, 219, 0);
+            transition: all 0.3s;
+        }
+        
+        .input-light.on {
+            box-shadow: 0 0 15px rgba(52, 152, 219, 0.8);
+        }
+        
+        .gate-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 20px;
+            flex-grow: 1;
+        }
+        
+        .wire-horizontal {
+            height: 2px;
+            background-color: #7f8c8d;
+            margin: 10px 0;
+            width: 100%;
+        }
+        
+        .gate {
+            position: relative;
+            width: 100px;
+            height: 70px;
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            font-size: 24px;
+            box-shadow: 0 5px 15px rgba(155, 89, 182, 0.3);
+        }
+        
+        .gate-inputs {
+            position: absolute;
+            left: -20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            height: 100%;
+        }
+        
+        .gate-input {
+            width: 20px;
+            height: 2px;
+            background-color: #7f8c8d;
+        }
+        
+        .output-line {
+            position: absolute;
+            right: -20px;
+            width: 20px;
+            height: 2px;
+            background-color: #7f8c8d;
+        }
+        
+        .output-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            width: 200px;
+        }
+        
+        .output-row {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            width: 100%;
+        }
+        
+        .output-light {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #9b59b6;
+            margin-right: 15px;
+            box-shadow: 0 0 15px rgba(155, 89, 182, 0);
+            transition: all 0.3s;
+        }
+        
+        .output-light.on {
+            box-shadow: 0 0 20px rgba(155, 89, 182, 0.8);
+        }
+        
+        .output-label {
+            font-weight: bold;
+        }
+        
+        .connection-line {
+            height: 2px;
+            background-color: #7f8c8d;
+            flex-grow: 1;
+            margin: 0 10px;
+        }
+        
+        .truth-table {
+            margin-top: 40px;
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 14px;
+        }
+        
+        .truth-table th, .truth-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        
+        .truth-table th {
+            background-color: #9b59b6;
+            color: white;
+        }
+        
+        .truth-table tr:nth-child(even) {
+            background-color: #f5eef8;
+        }
+        
+        .highlight {
+            background-color: #ffffcc !important;
+            font-weight: bold;
+        }
+        
+        .true-value {
+            color: #2ecc71;
+            font-weight: bold;
+        }
+        
+        .false-value {
+            color: #7f8c8d;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Puerta Lógica NOT - Tabla de Verdad V/F</h1>
+        
+        <div class="circuit-row">
+            <div class="input-container">
+                <div class="input-row">
+                    <div class="input-label">Entrada</div>
+                    <div class="switch" id="switchInput"></div>
+                    <div class="input-light" id="lightInput"></div>
+                </div>
+            </div>
+            
+            <div class="connection-line"></div>
+            
+            <div class="gate-container">
+                <div class="wire-horizontal"></div>
+                <div class="gate">
+                    NOT
+                    <div class="gate-inputs">
+                        <div class="gate-input"></div>
+                    </div>
+                    <div class="output-line"></div>
+                </div>
+                <div class="wire-horizontal"></div>
+            </div>
+            
+            <div class="connection-line"></div>
+            
+            <div class="output-container">
+                <div class="output-row">
+                    <div class="output-light" id="outputLight"></div>
+                    <div class="output-label">Salida (NOT A)</div>
+                </div>
+            </div>
+        </div>
+        
+        <table class="truth-table">
+            <thead>
+                <tr>
+                    <th>Entrada</th>
+                    <th>Salida</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr id="row1">
+                    <td class="true-value">V</td>
+                    <td class="false-value">F</td>
+                </tr>
+                <tr id="row2">
+                    <td class="false-value">F</td>
+                    <td class="true-value">V</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const switchInput = document.getElementById('switchInput');
+        const lightInput = document.getElementById('lightInput');
+        const outputLight = document.getElementById('outputLight');
+        
+        // Estado inicial
+        let inputState = false;
+        
+        // Actualizar la tabla de verdad al inicio
+        updateTruthTable();
+        
+        // Agregar event listener al interruptor
+        switchInput.addEventListener('click', () => {
+            inputState = !inputState;
+            updateSwitches();
+            updateTruthTable();
+        });
+        
+        function updateSwitches() {
+            // Actualizar interruptor de entrada
+            if (inputState) {
+                switchInput.classList.add('on');
+                lightInput.classList.add('on');
+            } else {
+                switchInput.classList.remove('on');
+                lightInput.classList.remove('on');
+            }
+            
+            // Actualizar salida (NOT)
+            if (!inputState) { // La salida es el opuesto de la entrada
+                outputLight.classList.add('on');
+            } else {
+                outputLight.classList.remove('on');
+            }
+        }
+        
+        function updateTruthTable() {
+            // Quitar resaltado de todas las filas
+            document.getElementById('row1').classList.remove('highlight');
+            document.getElementById('row2').classList.remove('highlight');
+            
+            // Resaltar la fila correspondiente al estado actual
+            if (inputState) {
+                document.getElementById('row1').classList.add('highlight');
+            } else {
+                document.getElementById('row2').classList.add('highlight');
+            }
+        }
+    </script>
+</body>
+</html>

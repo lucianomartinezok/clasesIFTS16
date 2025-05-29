@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demostraciones Lógicas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            height: 100vh;
+            background-color: #f5f5f5;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px 0;
+            overflow-y: auto;
+            height: 100%;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid #34495e;
+            margin-bottom: 20px;
+        }
+        
+        .sidebar h2 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .menu {
+            list-style: none;
+        }
+        
+        .menu-item {
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .menu-item:hover {
+            background-color: #34495e;
+        }
+        
+        .menu-item.active {
+            background-color: #3498db;
+            font-weight: bold;
+        }
+        
+        .content-area {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: white;
+        }
+        
+        .content-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .welcome-message {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            flex-direction: column;
+            color: #7f8c8d;
+            text-align: center;
+        }
+        
+        .welcome-message h2 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+                max-height: 200px;
+            }
+        }
+
+
+        .btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 5px;
+      background-color: red;
+      color: var(--text-light);
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 11px;
+      margin: 25px;
+    }
+
+    #btnvolver {
+
+        margin-top: 22px;
+    }
+   a {
+      text-decoration: none;
+    }
+
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>Demostraciones Lógicas</h2>
+            <p>Seleccione una compuerta</p>
+        </div>
+        <ul class="menu" id="menu">
+            <!-- Los elementos del menú se agregarán dinámicamente con JavaScript -->
+        </ul>
+        <div id="btnvolver">
+            <a href="../index.html" class="btn">volver a la portada</a>
+        </div>
+
+    </div>
+    
+    <div class="content-area">
+        <div class="welcome-message" id="welcomeMessage">
+            <h2>Bienvenido al Visualizador de Compuertas Lógicas</h2>
+            <p>Seleccione una compuerta del menú lateral para ver su demostración interactiva.</p>
+            </br>
+            <p><img src="./puertas.jpg" alt=""></p>
+        </div>
+        <iframe class="content-frame" id="contentFrame" style="display: none;"></iframe>
+    </div>
+
+    <script>
+        // Lista de archivos HTML disponibles
+        const htmlFiles = [
+            { name: "Puerta AND", file: "01-and.html" },
+            { name: "Puerta OR", file: "02-or.html" },
+            { name: "Puerta NOT", file: "03-not.html" },
+            { name: "Puerta AND - 3 Input", file: "04-and3.html" },
+            { name: "Puerta OR - 3 Input", file: "05-or3.html" },
+            { name: "Puerta NOR", file: "06-nor.html" },
+            { name: "Puerta XOR", file: "07-xor.html" },
+            { name: "Puerta NAND", file: "08-nand.html" },
+            { name: "Puerta XNOR", file: "09-xnor.html" },
+          
+            
+            // Puedes agregar más archivos aquí o se cargarán automáticamente
+        ];
+        
+        const menu = document.getElementById('menu');
+        const welcomeMessage = document.getElementById('welcomeMessage');
+        const contentFrame = document.getElementById('contentFrame');
+        
+        // Función para cargar archivos HTML disponibles en el directorio
+        async function loadAvailableFiles() {
+            try {
+                // Intentamos cargar una lista de archivos (esto requiere que el servidor lo permita)
+                const response = await fetch('./?list-files');
+                if (response.ok) {
+                    const files = await response.json();
+                    // Filtramos solo archivos HTML
+                    const htmlFiles = files.filter(file => file.endsWith('.html') && file !== 'index.html');
+                    return htmlFiles.map(file => ({
+                        name: file.replace('.html', '').replace(/-/g, ' '),
+                        file: file
+                    }));
+                }
+            } catch (error) {
+                console.log("No se pudo cargar la lista de archivos automáticamente. Usando lista predeterminada.");
+            }
+            return htmlFiles;
+        }
+        
+        // Función para renderizar el menú
+        async function renderMenu() {
+            const availableFiles = await loadAvailableFiles();
+            menu.innerHTML = '';
+            
+            availableFiles.forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'menu-item';
+                li.textContent = item.name;
+                li.dataset.file = item.file;
+                li.addEventListener('click', () => loadContent(item.file, li));
+                menu.appendChild(li);
+            });
+        }
+        
+        // Función para cargar contenido en el iframe
+        function loadContent(file, menuItem) {
+            // Actualizar clases activas
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            menuItem.classList.add('active');
+            
+            // Mostrar el iframe y ocultar el mensaje de bienvenida
+            contentFrame.style.display = 'block';
+            welcomeMessage.style.display = 'none';
+            
+            // Cargar el contenido
+            contentFrame.src = file;
+        }
+        
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', renderMenu);
+        
+        // Permitir agregar archivos dinámicamente desde la consola (para desarrollo)
+        window.addFileToMenu = function(name, file) {
+            const li = document.createElement('li');
+            li.className = 'menu-item';
+            li.textContent = name;
+            li.dataset.file = file;
+            li.addEventListener('click', () => loadContent(file, li));
+            menu.appendChild(li);
+        };
+    </script>
+</body>
+</html>
