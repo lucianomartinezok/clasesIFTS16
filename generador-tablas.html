@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Generador de Tablas de Verdad</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #f0f4f8;
+      padding: 40px;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+    }
+    h1 {
+      color: #2c3e50;
+      text-align: center;
+    }
+    p {
+      text-align: center;
+      max-width: 600px;
+    }
+    input, button {
+      padding: 10px;
+      margin: 5px 2px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    input {
+      width: 300px;
+    }
+    button {
+      background-color: #3498db;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #2980b9;
+    }
+    .buttons-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .buttons-container button {
+      min-width: 35px;
+      background-color: #ecf0f1;
+      color: #2c3e50;
+    }
+    .buttons-container button:hover {
+      background-color: #bdc3c7;
+    }
+    table {
+      border-collapse: collapse;
+      margin-top: 20px;
+      width: 100%;
+      max-width: 800px;
+      background-color: white;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+      font-weight: bold;
+    }
+    th {
+      background-color: #2980b9;
+      color: white;
+    }
+    .v-cell {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    .f-cell {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    .true-row {
+      border: 3px solid #28a745 !important;
+      background-color: #c3f5cb;
+    }
+    #tableContainer {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>Generador de Tablas de Verdad</h1>
+  <p>Usa los botones para armar la expresión lógica:</p>
+  <div class="buttons-container">
+    <button onclick="appendValue('p')">p</button>
+    <button onclick="appendValue('q')">q</button>
+    <button onclick="appendValue('r')">r</button>
+    <button onclick="appendValue('s')">s</button>
+    <button onclick="appendValue('t')">t</button>
+    <button onclick="appendValue('(')">(</button>
+    <button onclick="appendValue(')')">)</button>
+    <button onclick="appendValue('~')">~</button>
+    <button onclick="appendValue('.')">.</button>
+    <button onclick="appendValue('+')">+</button>
+    <button onclick="clearInput()">Borrar</button>
+  </div>
+  <input type="text" id="expression" placeholder="Ejemplo: p.q + ~r">
+  <button onclick="generateTable()">Generar Tabla</button>
+  <div id="tableContainer"></div>
+
+  <script>
+    function appendValue(val) {
+      document.getElementById('expression').value += val;
+    }
+
+    function clearInput() {
+      document.getElementById('expression').value = '';
+    }
+
+    function generateTable() {
+      const input = document.getElementById('expression').value;
+      const vars = [...new Set(input.match(/[a-z]/g))].sort();
+      const combinations = getCombinations(vars.length);
+
+      let tableHTML = '<table><tr>' + vars.map(v => `<th>${v}</th>`).join('') + `<th>${input}</th></tr>`;
+
+      combinations.forEach(combo => {
+        let expr = input;
+        vars.forEach((v, i) => {
+          expr = expr.replaceAll(new RegExp(`\\b${v}\\b`, 'g'), combo[i] ? 'true' : 'false');
+        });
+        expr = expr.replace(/~/g, '!').replace(/\./g, '&&').replace(/\+/g, '||');
+        let result;
+        try {
+          result = eval(expr);
+        } catch {
+          result = 'Error';
+        }
+
+        const resultDisplay = result === true ? 'V' : result === false ? 'F' : result;
+        const rowClass = result === true ? 'true-row' : '';
+        tableHTML += `<tr class="${rowClass}">` +
+          combo.map(v => `<td class="${v ? 'v-cell' : 'f-cell'}">${v ? 'V' : 'F'}</td>`).join('') +
+          `<td class="${result === true ? 'v-cell' : result === false ? 'f-cell' : ''}">${resultDisplay}</td></tr>`;
+      });
+
+      document.getElementById('tableContainer').innerHTML = tableHTML + '</table>';
+    }
+
+    function getCombinations(n) {
+      const combos = [];
+      for (let i = 0; i < 1 << n; i++) {
+        const combo = [];
+        for (let j = n - 1; j >= 0; j--) {
+          combo.push(Boolean(i & (1 << j)));
+        }
+        combos.push(combo);
+      }
+      return combos;
+    }
+  </script>
+</body>
+</html>
